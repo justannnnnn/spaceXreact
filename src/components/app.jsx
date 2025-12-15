@@ -2,6 +2,7 @@ import { LaunchList } from "./launchList";
 import { Map } from "./map";
 import { useEffect, useState } from "react";
 import { SpaceX } from "../api/spacex";
+import worldGeo from "../geo.json";
 
 function App() {
   const [launches, setLaunches] = useState([]);
@@ -22,10 +23,6 @@ function App() {
       })
       .then(lch => {
         setLaunches(lch);
-        return fetch("geo.json").then(r => r.json());
-      })
-      .then(world => {
-        setWorldMap(world);
         setLoading(false);
       })
       .catch(err => {
@@ -41,7 +38,7 @@ function App() {
   return (
     <main className="main">
       <LaunchList launches={launches} launchpads={launchpads} />
-      <Map launches={launches} launchpads={launchpads} worldMap={worldMap} />
+      <Map launches={launches} launchpads={launchpads} worldMap={worldGeo} />
     </main>
   );
 }

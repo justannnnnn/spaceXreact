@@ -1,17 +1,41 @@
 .main {
-    display: flex;
+  display: flex;
 }
 
 .aside {
-    flex-grow: 0.3;
+  flex-grow: 0.3;
 }
 
-.content {
-    flex-grow: 0.7;
+.map {
+  flex-grow: 0.7;
 }
-#listContainer{
-    height: 300px;
-    overflow: hidden;
-    overflow-y: scroll;
-    border: black 1px solid;
+
+#listContainer {
+  height: 300px;
+  overflow-y: scroll;
+  border: black 1px solid;
+}
+
+/* Подсветка launchpads */
+.pad-point {
+  fill: red;
+  opacity: 0.7;
+  transition: 0.2s;
+}
+
+.pad-point.highlight {
+  fill: orange;
+  r: 10 !important;
+  opacity: 1;
+}
+
+.tooltip {
+  position: absolute;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  padding: 5px 8px;
+  border-radius: 4px;
+  pointer-events: none;
+  font-size: 12px;
+  opacity: 0;
 }
