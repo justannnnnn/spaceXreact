@@ -1,52 +1,85 @@
+import { useEffect, useRef } from "react";
 import * as d3 from "d3";
-import * as Geo from "../geo.json";
-import {useRef, useEffect} from "react";
 
-function Map(props){
-    const width = 1000;
-    const height = 600;
-    const margin = {
-        top: 20,
-        right: 20,
-        bottom: 20,
-        left: 100
-    };
-    const containerRef = useRef(null);
-    useEffect(()=> { const svg = d3.select(containerRef.current).append("svg");
-        svg.selectAll("*").remove();
-        svg.attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom )
-            .append("g")
-            .attr("transform", `translate(${margin.left},${margin.top})`)
+function Map({ launchpads, worldMap }) {
+  const svgRef = useRef();
 
-        const projection = d3.geoMercator()
-            .scale(70)
-            .center([0, 20])
-            .translate([width/2 - margin.left, height/2 - margin.top]);
-        const g = svg.append("g");
+  useEffect(() => {
+    if (!worldMap || !launchpads) return;
 
-        g.selectAll("path")
-            .data(Geo.features)
-            .enter()
-            .append("path")
-            .attr("class", "topo")
-            .attr("d", d3.geoPath().projection(projection))
-            .style("opacity", .7)
-        const zoom = d3.zoom()
-            .scaleExtent([1, 8])
-            .on('zoom', function(event) {
-                g.selectAll('path')
-                    .attr('transform', event.transform);
-            });
+    const svg = d3.select(svgRef.current);
+    svg.selectAll("*").remove();
 
-        svg.call(zoom); }, []);
+    const width = +svg.attr("width");
+    const height = +svg.attr("height");
 
+    const g = svg.append("g");
+    const projection = d3.geoMercator()
+      .scale(140)
+      .translate([width / 2, height / 1.4]);
 
+    // Рисуем мир
+    const geoPath = d3.geoPath().projection(projection);
+    g.selectAll("path")
+      .data(worldMap.features)
+      .enter()
+      .append("path")
+      .attr("d", geoPath)
+      .attr("fill", "#ddd")
+      .attr("stroke", "#999");
 
-    return(
-        <div className="mapContainer map" ref={containerRef}>
-        </div>
-    )
+    // Launchpads
+    const tooltip = d3.select("body")
+      .append("div")
+      .attr("class", "tooltip")
+      .style("position", "absolute")
+      .style("background", "rgba(0,0,0,0.7)")
+      .style("color", "#fff")
+      .style("padding", "5px 8px")
+      .style("border-radius", "4px")
+      .style("pointer-events", "none")
+      .style("opacity", 0);
+
+    g.selectAll(".pad-point")
+      .data(launchpads)
+      .enter()
+      .append("circle")
+      .attr("class", "pad-point")
+      .attr("r", 5)
+      .attr("data-id", d => d.id)
+      .attr("transform", d => {
+        const coords = projection([d.longitude, d.latitude]);
+        return `translate(${coords[0]}, ${coords[1]})`;
+      })
+      .on("mouseover", function(event, d) {
+        d3.selectAll(".pad-point").classed("highlight", false);
+        d3.select(this).classed("highlight", true).raise();
+        tooltip.transition().duration(200).style("opacity", 1);
+        tooltip.html(d.name)
+          .style("left", (event.pageX + 10) + "px")
+          .style("top", (event.pageY + 10) + "px");
+      })
+      .on("mousemove", function(event) {
+        tooltip
+          .style("left", (event.pageX + 10) + "px")
+          .style("top", (event.pageY + 10) + "px");
+      })
+      .on("mouseout", function() {
+        d3.selectAll(".pad-point").classed("highlight", false);
+        tooltip.transition().duration(200).style("opacity", 0);
+      });
+
+    // Zoom
+    const zoom = d3.zoom()
+      .scaleExtent([1, 8])
+      .on("zoom", event => {
+        g.attr("transform", event.transform);
+      });
+    svg.call(zoom);
+
+  }, [launchpads, worldMap]);
+
+  return <svg id="map" width="900" height="500" ref={svgRef}></svg>;
 }
 
-export {Map}
+export { Map };
