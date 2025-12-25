@@ -15,7 +15,6 @@ function App() {
     const spaceX = new SpaceX();
     setLoading(true);
 
-    // Загрузка данных как в старой версии
     spaceX.launchpads()
       .then(lp => {
         setLaunchpads(lp);

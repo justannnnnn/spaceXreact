@@ -18,7 +18,7 @@ function Map({ launchpads, worldMap }) {
       .scale(140)
       .translate([width / 2, height / 1.4]);
 
-    // Рисуем мир
+
     const geoPath = d3.geoPath().projection(projection);
     g.selectAll("path")
       .data(worldMap.features)
@@ -28,7 +28,7 @@ function Map({ launchpads, worldMap }) {
       .attr("fill", "#ddd")
       .attr("stroke", "#999");
 
-    // Launchpads
+      
     const tooltip = d3.select("body")
       .append("div")
       .attr("class", "tooltip")

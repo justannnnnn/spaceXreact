@@ -1,7 +1,3 @@
-import * as d3 from "d3"
-import * as Geo from "./geo.json"
-
-import {React} from 'react'
 import ReactDOM from 'react-dom/client'
 import {App} from "./components/app";
 
